@@ -4,6 +4,7 @@ import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
 import co.com.onemillion.api.dto.LeadStatsResponse;
+import co.com.onemillion.api.dto.LeadSummaryRequest;
 import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.api.mapper.LeadRestMapper;
 import co.com.onemillion.model.lead.Lead;
@@ -95,9 +96,11 @@ public class ApiRest {
         return ResponseEntity.ok(LeadRestMapper.toStatsResponse(stats));
     }
 
-    @GetMapping("/summary")
-    public ResponseEntity<Map<String, String>> getSummary() {
-        String summary = getAiLeadSummaryUseCase.execute();
+    @PostMapping(value = "/ai/summary", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> getAiSummary(@RequestBody(required = false) LeadSummaryRequest request) {
+        LeadSummaryRequest safeRequest = request != null ? request : new LeadSummaryRequest(null, null, null);
+        LeadFilter filter = LeadRestMapper.toFilter(0, 1000, safeRequest.source(), safeRequest.startDate(), safeRequest.endDate());
+        String summary = getAiLeadSummaryUseCase.execute(filter);
         return ResponseEntity.ok(Collections.singletonMap("summary", summary));
     }
 }
