@@ -1,6 +1,7 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+	implementation project(':ai-summary-mock')
 	implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
 	implementation project(':jpa-repository')
 	testImplementation 'org.springframework:spring-web'
