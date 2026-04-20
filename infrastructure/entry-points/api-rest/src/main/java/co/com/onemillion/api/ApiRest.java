@@ -3,15 +3,18 @@ package co.com.onemillion.api;
 import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
+import co.com.onemillion.api.dto.LeadStatsResponse;
 import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.api.mapper.LeadRestMapper;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadFilter;
 import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadPatch;
+import co.com.onemillion.model.lead.LeadStats;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
 import co.com.onemillion.usecase.deletelead.DeleteLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
+import co.com.onemillion.usecase.getleadstats.GetLeadStatsUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
 import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
 import jakarta.validation.Valid;
@@ -39,6 +42,7 @@ public class ApiRest {
     private final ListLeadsUseCase listLeadsUseCase;
     private final UpdateLeadUseCase updateLeadUseCase;
     private final DeleteLeadUseCase deleteLeadUseCase;
+    private final GetLeadStatsUseCase getLeadStatsUseCase;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> createLead(@Valid @RequestBody CreateLeadRequest request) {
@@ -79,5 +83,11 @@ public class ApiRest {
     public ResponseEntity<Void> deleteLead(@PathVariable("id") Long id) {
         deleteLeadUseCase.execute(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<LeadStatsResponse> getStats() {
+        LeadStats stats = getLeadStatsUseCase.execute();
+        return ResponseEntity.ok(LeadRestMapper.toStatsResponse(stats));
     }
 }

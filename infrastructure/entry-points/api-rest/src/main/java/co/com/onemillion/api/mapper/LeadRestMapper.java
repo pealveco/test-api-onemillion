@@ -3,12 +3,14 @@ package co.com.onemillion.api.mapper;
 import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
+import co.com.onemillion.api.dto.LeadStatsResponse;
 import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadFilter;
 import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadPatch;
 import co.com.onemillion.model.lead.LeadSource;
+import co.com.onemillion.model.lead.LeadStats;
 import co.com.onemillion.model.lead.exceptions.ValidationException;
 
 import java.time.LocalDate;
@@ -57,6 +59,15 @@ public final class LeadRestMapper {
                 leadPage.getTotal(),
                 leadPage.getTotalPages()
         );
+    }
+
+    public static LeadStatsResponse toStatsResponse(LeadStats stats) {
+        return LeadStatsResponse.builder()
+                .totalLeads(stats.getTotalLeads())
+                .leadsBySource(stats.getLeadsBySource())
+                .averageBudget(stats.getAverageBudget())
+                .last7DaysLeads(stats.getLast7DaysLeads())
+                .build();
     }
 
     public static LeadFilter toFilter(int page, int limit, String source, String startDate, String endDate) {
