@@ -1,11 +1,14 @@
 package co.com.onemillion.api;
 
 import co.com.onemillion.api.dto.CreateLeadRequest;
+import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
 import co.com.onemillion.model.lead.Lead;
+import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
+import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,7 +31,8 @@ class ApiRestTest {
     void shouldCreateLead() {
         CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase);
+        ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(createLeadUseCase.execute(any(Lead.class))).thenReturn(Lead.builder()
@@ -59,7 +64,8 @@ class ApiRestTest {
     void shouldGetLeadById() {
         CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase);
+        ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(getLeadByIdUseCase.execute(1L)).thenReturn(Lead.builder()
@@ -75,6 +81,35 @@ class ApiRestTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1L, response.getBody().id());
+    }
+
+    @Test
+    void shouldListLeads() {
+        CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
+        GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
+        ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
+        LocalDateTime now = LocalDateTime.now();
+
+        when(listLeadsUseCase.execute(any())).thenReturn(LeadPage.builder()
+                .data(List.of(Lead.builder()
+                        .id(1L)
+                        .nombre("Ana Perez")
+                        .email("ana@test.com")
+                        .fuente(LeadSource.INSTAGRAM)
+                        .createdAt(now)
+                        .updatedAt(now)
+                        .build()))
+                .page(0)
+                .limit(10)
+                .total(1)
+                .build());
+
+        ResponseEntity<LeadPageResponse> response = apiRest.listLeads(0, 10, "instagram", null, null);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().data().size());
+        assertEquals(1, response.getBody().total());
     }
 
     @Test

@@ -1,12 +1,15 @@
 package co.com.onemillion.jpa;
 
 import co.com.onemillion.model.lead.Lead;
+import co.com.onemillion.model.lead.LeadFilter;
+import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.model.lead.exceptions.DuplicateLeadException;
 import co.com.onemillion.model.lead.gateways.LeadRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,16 +50,21 @@ public class JPARepositoryAdapter implements LeadRepository {
     }
 
     @Override
-    public List<Lead> findAll(int page, int limit, LeadSource fuente, LocalDateTime createdAtFrom,
-                              LocalDateTime createdAtTo) {
-        int safePage = Math.max(page, 0);
-        int safeLimit = Math.max(limit, 1);
+    public LeadPage findAll(LeadFilter filter) {
+        int safePage = Math.max(filter.getPage(), 0);
+        int safeLimit = Math.max(filter.getLimit(), 1);
         PageRequest pageRequest = PageRequest.of(safePage, safeLimit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<LeadData> page = repository.findAll(
+                filterBy(filter.getSource(), filter.getStartDate(), filter.getEndDate()),
+                pageRequest
+        );
 
-        return repository.findAll(filterBy(fuente, createdAtFrom, createdAtTo), pageRequest)
-                .stream()
-                .map(this::toDomain)
-                .toList();
+        return LeadPage.builder()
+                .data(page.stream().map(this::toDomain).toList())
+                .page(filter.getPage())
+                .limit(filter.getLimit())
+                .total(page.getTotalElements())
+                .build();
     }
 
     @Override

@@ -1,11 +1,17 @@
 package co.com.onemillion.api.mapper;
 
 import co.com.onemillion.api.dto.CreateLeadRequest;
+import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
 import co.com.onemillion.model.lead.Lead;
+import co.com.onemillion.model.lead.LeadFilter;
+import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.model.lead.exceptions.ValidationException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 public final class LeadRestMapper {
@@ -41,6 +47,26 @@ public final class LeadRestMapper {
         );
     }
 
+    public static LeadPageResponse toPageResponse(LeadPage leadPage) {
+        return new LeadPageResponse(
+                leadPage.getData().stream().map(LeadRestMapper::toResponse).toList(),
+                leadPage.getPage(),
+                leadPage.getLimit(),
+                leadPage.getTotal(),
+                leadPage.getTotalPages()
+        );
+    }
+
+    public static LeadFilter toFilter(int page, int limit, String source, String startDate, String endDate) {
+        return LeadFilter.builder()
+                .page(page)
+                .limit(limit)
+                .source(toLeadSource(source))
+                .startDate(toStartDate(startDate))
+                .endDate(toEndDate(endDate))
+                .build();
+    }
+
     private static LeadSource toLeadSource(String source) {
         if (source == null || source.trim().isEmpty()) {
             return null;
@@ -54,5 +80,38 @@ public final class LeadRestMapper {
 
     private static String toApiSource(LeadSource source) {
         return source == null ? null : source.name().toLowerCase(Locale.ROOT);
+    }
+
+    private static LocalDateTime toStartDate(String value) {
+        LocalDateTime dateTime = toDateTime(value);
+        return dateTime != null ? dateTime : toDate(value, false);
+    }
+
+    private static LocalDateTime toEndDate(String value) {
+        LocalDateTime dateTime = toDateTime(value);
+        return dateTime != null ? dateTime : toDate(value, true);
+    }
+
+    private static LocalDateTime toDateTime(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(value.trim());
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
+    }
+
+    private static LocalDateTime toDate(String value, boolean endOfDay) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            LocalDate date = LocalDate.parse(value.trim());
+            return endOfDay ? date.atTime(23, 59, 59, 999_999_999) : date.atStartOfDay();
+        } catch (DateTimeParseException exception) {
+            throw new ValidationException("Las fechas deben tener formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+        }
     }
 }
