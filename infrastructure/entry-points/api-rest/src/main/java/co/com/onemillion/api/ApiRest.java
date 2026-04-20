@@ -19,6 +19,8 @@ import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.getleadstats.GetLeadStatsUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
 import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -40,6 +42,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/leads", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@Tag(name = "Leads", description = "Endpoints para la gestión de prospectos y analítica")
 public class ApiRest {
     private final CreateLeadUseCase createLeadUseCase;
     private final GetLeadByIdUseCase getLeadByIdUseCase;
@@ -49,6 +52,7 @@ public class ApiRest {
     private final GetLeadStatsUseCase getLeadStatsUseCase;
     private final GetAiLeadSummaryUseCase getAiLeadSummaryUseCase;
 
+    @Operation(summary = "Crear un nuevo lead")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> createLead(@Valid @RequestBody CreateLeadRequest request) {
         Lead createdLead = createLeadUseCase.execute(LeadRestMapper.toDomain(request));
@@ -57,12 +61,14 @@ public class ApiRest {
                 .body(LeadRestMapper.toResponse(createdLead));
     }
 
+    @Operation(summary = "Obtener lead por ID")
     @GetMapping("/{id}")
     public ResponseEntity<LeadResponse> getLeadById(@PathVariable("id") Long id) {
         Lead lead = getLeadByIdUseCase.execute(id);
         return ResponseEntity.ok(LeadRestMapper.toResponse(lead));
     }
 
+    @Operation(summary = "Actualizar parcialmente un lead (Patch)")
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> updateLead(@PathVariable("id") Long id,
                                                    @Valid @RequestBody UpdateLeadRequest request) {
@@ -71,6 +77,7 @@ public class ApiRest {
         return ResponseEntity.ok(LeadRestMapper.toResponse(updatedLead));
     }
 
+    @Operation(summary = "Listar leads con filtros y paginación")
     @GetMapping
     public ResponseEntity<LeadPageResponse> listLeads(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -84,18 +91,21 @@ public class ApiRest {
         return ResponseEntity.ok(LeadRestMapper.toPageResponse(leads));
     }
 
+    @Operation(summary = "Eliminar un lead (Soft delete)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLead(@PathVariable("id") Long id) {
         deleteLeadUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Obtener estadísticas generales de leads")
     @GetMapping("/stats")
     public ResponseEntity<LeadStatsResponse> getStats() {
         LeadStats stats = getLeadStatsUseCase.execute();
         return ResponseEntity.ok(LeadRestMapper.toStatsResponse(stats));
     }
 
+    @Operation(summary = "Generar resumen ejecutivo con IA (Mock)")
     @PostMapping(value = "/ai/summary", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> getAiSummary(@RequestBody(required = false) LeadSummaryRequest request) {
         LeadSummaryRequest safeRequest = request != null ? request : new LeadSummaryRequest(null, null, null);
