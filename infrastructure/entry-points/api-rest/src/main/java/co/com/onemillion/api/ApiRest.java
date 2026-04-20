@@ -61,6 +61,12 @@ public class ApiRest {
                 .body(LeadRestMapper.toResponse(createdLead));
     }
 
+    @Operation(summary = "Webhook para recepción externa de leads (ej: Typeform)")
+    @PostMapping(value = "/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LeadResponse> webhook(@Valid @RequestBody CreateLeadRequest request) {
+        return createLead(request);
+    }
+
     @Operation(summary = "Obtener lead por ID")
     @GetMapping("/{id}")
     public ResponseEntity<LeadResponse> getLeadById(@PathVariable("id") Long id) {
