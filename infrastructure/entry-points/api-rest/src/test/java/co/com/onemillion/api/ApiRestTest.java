@@ -8,6 +8,7 @@ import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
+import co.com.onemillion.usecase.deletelead.DeleteLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
 import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
@@ -35,7 +36,9 @@ class ApiRestTest {
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
         UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
+        DeleteLeadUseCase deleteLeadUseCase = mock(DeleteLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase,
+                deleteLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(createLeadUseCase.execute(any(Lead.class))).thenReturn(Lead.builder()
@@ -69,7 +72,9 @@ class ApiRestTest {
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
         UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
+        DeleteLeadUseCase deleteLeadUseCase = mock(DeleteLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase,
+                deleteLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(getLeadByIdUseCase.execute(1L)).thenReturn(Lead.builder()
@@ -93,7 +98,9 @@ class ApiRestTest {
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
         UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
+        DeleteLeadUseCase deleteLeadUseCase = mock(DeleteLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase,
+                deleteLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(listLeadsUseCase.execute(any())).thenReturn(LeadPage.builder()
@@ -123,7 +130,9 @@ class ApiRestTest {
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
         UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
+        DeleteLeadUseCase deleteLeadUseCase = mock(DeleteLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase,
+                deleteLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
         UpdateLeadRequest request = new UpdateLeadRequest();
         request.setNombre("Ana Actualizada");
@@ -141,6 +150,21 @@ class ApiRestTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Ana Actualizada", response.getBody().nombre());
+    }
+
+    @Test
+    void shouldDeleteLead() {
+        CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
+        GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
+        ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
+        UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
+        DeleteLeadUseCase deleteLeadUseCase = mock(DeleteLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase,
+                deleteLeadUseCase);
+
+        ResponseEntity<Void> response = apiRest.deleteLead(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test

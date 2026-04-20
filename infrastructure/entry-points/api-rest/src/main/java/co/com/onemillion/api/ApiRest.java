@@ -10,6 +10,7 @@ import co.com.onemillion.model.lead.LeadFilter;
 import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadPatch;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
+import co.com.onemillion.usecase.deletelead.DeleteLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
 import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +38,7 @@ public class ApiRest {
     private final GetLeadByIdUseCase getLeadByIdUseCase;
     private final ListLeadsUseCase listLeadsUseCase;
     private final UpdateLeadUseCase updateLeadUseCase;
+    private final DeleteLeadUseCase deleteLeadUseCase;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> createLead(@Valid @RequestBody CreateLeadRequest request) {
@@ -70,5 +73,11 @@ public class ApiRest {
         LeadFilter filter = LeadRestMapper.toFilter(page, limit, source, startDate, endDate);
         LeadPage leads = listLeadsUseCase.execute(filter);
         return ResponseEntity.ok(LeadRestMapper.toPageResponse(leads));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLead(@PathVariable("id") Long id) {
+        deleteLeadUseCase.execute(id);
+        return ResponseEntity.noContent().build();
     }
 }
