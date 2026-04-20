@@ -2,6 +2,7 @@ package co.com.onemillion.api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public record CreateLeadRequest(
 
         String productoInteres,
 
+        @PositiveOrZero(message = "El presupuesto no puede ser negativo")
         BigDecimal presupuesto
 ) {
 }

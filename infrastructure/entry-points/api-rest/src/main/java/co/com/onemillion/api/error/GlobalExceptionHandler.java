@@ -63,4 +63,10 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("INVALID_REQUEST",
                         "El parametro " + exception.getName() + " tiene un formato invalido"));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("INTERNAL_SERVER_ERROR", "Ha ocurrido un error inesperado"));
+    }
 }
