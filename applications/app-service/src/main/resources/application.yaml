@@ -16,6 +16,7 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+    driverClassName: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -24,7 +25,21 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    databasePlatform: org.hibernate.dialect.PostgreSQLDialect
 
   sql:
     init:
       mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+cors:
+  allowed-origins: http://localhost:4200,http://localhost:8080
