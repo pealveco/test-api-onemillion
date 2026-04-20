@@ -13,6 +13,7 @@ import co.com.onemillion.model.lead.LeadPatch;
 import co.com.onemillion.model.lead.LeadStats;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
 import co.com.onemillion.usecase.deletelead.DeleteLeadUseCase;
+import co.com.onemillion.usecase.getaileadsummary.GetAiLeadSummaryUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.getleadstats.GetLeadStatsUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
@@ -32,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/leads", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,6 +46,7 @@ public class ApiRest {
     private final UpdateLeadUseCase updateLeadUseCase;
     private final DeleteLeadUseCase deleteLeadUseCase;
     private final GetLeadStatsUseCase getLeadStatsUseCase;
+    private final GetAiLeadSummaryUseCase getAiLeadSummaryUseCase;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> createLead(@Valid @RequestBody CreateLeadRequest request) {
@@ -89,5 +93,11 @@ public class ApiRest {
     public ResponseEntity<LeadStatsResponse> getStats() {
         LeadStats stats = getLeadStatsUseCase.execute();
         return ResponseEntity.ok(LeadRestMapper.toStatsResponse(stats));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, String>> getSummary() {
+        String summary = getAiLeadSummaryUseCase.execute();
+        return ResponseEntity.ok(Collections.singletonMap("summary", summary));
     }
 }
