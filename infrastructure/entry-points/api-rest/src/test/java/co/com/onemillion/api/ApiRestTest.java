@@ -3,12 +3,14 @@ package co.com.onemillion.api;
 import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
+import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadPage;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
+import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,8 @@ class ApiRestTest {
         CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
+        UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(createLeadUseCase.execute(any(Lead.class))).thenReturn(Lead.builder()
@@ -65,7 +68,8 @@ class ApiRestTest {
         CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
+        UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(getLeadByIdUseCase.execute(1L)).thenReturn(Lead.builder()
@@ -88,7 +92,8 @@ class ApiRestTest {
         CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
         GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
         ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
-        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase);
+        UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
         LocalDateTime now = LocalDateTime.now();
 
         when(listLeadsUseCase.execute(any())).thenReturn(LeadPage.builder()
@@ -110,6 +115,32 @@ class ApiRestTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().data().size());
         assertEquals(1, response.getBody().total());
+    }
+
+    @Test
+    void shouldUpdateLead() {
+        CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
+        GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
+        ListLeadsUseCase listLeadsUseCase = mock(ListLeadsUseCase.class);
+        UpdateLeadUseCase updateLeadUseCase = mock(UpdateLeadUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase, listLeadsUseCase, updateLeadUseCase);
+        LocalDateTime now = LocalDateTime.now();
+        UpdateLeadRequest request = new UpdateLeadRequest();
+        request.setNombre("Ana Actualizada");
+
+        when(updateLeadUseCase.execute(any(), any())).thenReturn(Lead.builder()
+                .id(1L)
+                .nombre("Ana Actualizada")
+                .email("ana@test.com")
+                .fuente(LeadSource.INSTAGRAM)
+                .createdAt(now.minusDays(1))
+                .updatedAt(now)
+                .build());
+
+        ResponseEntity<LeadResponse> response = apiRest.updateLead(1L, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Ana Actualizada", response.getBody().nombre());
     }
 
     @Test

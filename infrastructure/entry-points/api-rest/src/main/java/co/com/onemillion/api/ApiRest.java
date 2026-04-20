@@ -3,19 +3,23 @@ package co.com.onemillion.api;
 import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
+import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.api.mapper.LeadRestMapper;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadFilter;
 import co.com.onemillion.model.lead.LeadPage;
+import co.com.onemillion.model.lead.LeadPatch;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
 import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import co.com.onemillion.usecase.listleads.ListLeadsUseCase;
+import co.com.onemillion.usecase.updatelead.UpdateLeadUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +35,7 @@ public class ApiRest {
     private final CreateLeadUseCase createLeadUseCase;
     private final GetLeadByIdUseCase getLeadByIdUseCase;
     private final ListLeadsUseCase listLeadsUseCase;
+    private final UpdateLeadUseCase updateLeadUseCase;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> createLead(@Valid @RequestBody CreateLeadRequest request) {
@@ -44,6 +49,14 @@ public class ApiRest {
     public ResponseEntity<LeadResponse> getLeadById(@PathVariable("id") Long id) {
         Lead lead = getLeadByIdUseCase.execute(id);
         return ResponseEntity.ok(LeadRestMapper.toResponse(lead));
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LeadResponse> updateLead(@PathVariable("id") Long id,
+                                                   @RequestBody UpdateLeadRequest request) {
+        LeadPatch patch = LeadRestMapper.toPatch(request);
+        Lead updatedLead = updateLeadUseCase.execute(id, patch);
+        return ResponseEntity.ok(LeadRestMapper.toResponse(updatedLead));
     }
 
     @GetMapping

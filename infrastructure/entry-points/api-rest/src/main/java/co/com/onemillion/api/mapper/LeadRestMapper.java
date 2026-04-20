@@ -3,9 +3,11 @@ package co.com.onemillion.api.mapper;
 import co.com.onemillion.api.dto.CreateLeadRequest;
 import co.com.onemillion.api.dto.LeadPageResponse;
 import co.com.onemillion.api.dto.LeadResponse;
+import co.com.onemillion.api.dto.UpdateLeadRequest;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadFilter;
 import co.com.onemillion.model.lead.LeadPage;
+import co.com.onemillion.model.lead.LeadPatch;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.model.lead.exceptions.ValidationException;
 
@@ -64,6 +66,27 @@ public final class LeadRestMapper {
                 .source(toLeadSource(source))
                 .startDate(toStartDate(startDate))
                 .endDate(toEndDate(endDate))
+                .build();
+    }
+
+    public static LeadPatch toPatch(UpdateLeadRequest request) {
+        if (request == null) {
+            throw new ValidationException("El cuerpo de la solicitud es obligatorio");
+        }
+
+        return LeadPatch.builder()
+                .nombrePresent(request.isPresent("nombre"))
+                .nombre(request.getNombre())
+                .emailPresent(request.isPresent("email"))
+                .email(request.getEmail())
+                .telefonoPresent(request.isPresent("telefono"))
+                .telefono(request.getTelefono())
+                .fuentePresent(request.isPresent("fuente"))
+                .fuente(toLeadSource(request.getFuente()))
+                .productoInteresPresent(request.isPresent("productoInteres"))
+                .productoInteres(request.getProductoInteres())
+                .presupuestoPresent(request.isPresent("presupuesto"))
+                .presupuesto(request.getPresupuesto())
                 .build();
     }
 
