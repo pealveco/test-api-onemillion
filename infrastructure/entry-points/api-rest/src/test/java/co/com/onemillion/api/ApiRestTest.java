@@ -157,4 +157,30 @@ class ApiRestTest {
 
         assertFalse(validator.validate(request).isEmpty());
     }
+
+    @Test
+    void shouldValidateInvalidPatchEmail() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        UpdateLeadRequest request = new UpdateLeadRequest();
+        request.setEmail("correo-malo");
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void shouldValidateEmptyPatchRequest() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        UpdateLeadRequest request = new UpdateLeadRequest();
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
+
+    @Test
+    void shouldValidateInvalidPatchSource() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        UpdateLeadRequest request = new UpdateLeadRequest();
+        request.setFuente("twitter");
+
+        assertFalse(validator.validate(request).isEmpty());
+    }
 }

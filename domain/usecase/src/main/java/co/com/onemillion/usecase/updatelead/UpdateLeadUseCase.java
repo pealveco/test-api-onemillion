@@ -9,13 +9,9 @@ import co.com.onemillion.model.lead.gateways.LeadRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class UpdateLeadUseCase {
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$",
-            Pattern.CASE_INSENSITIVE);
-
     private final LeadRepository leadRepository;
 
     public Lead execute(Long id, LeadPatch patch) {
@@ -63,29 +59,14 @@ public class UpdateLeadUseCase {
         if (!patch.hasAnyFieldPresent()) {
             throw new ValidationException("Debe enviar al menos un campo para actualizar");
         }
-        if (patch.isNombrePresent() && (isBlank(patch.getNombre()) || patch.getNombre().trim().length() < 2)) {
-            throw new ValidationException("El nombre debe tener al menos 2 caracteres");
-        }
-        if (patch.isEmailPresent()) {
-            validateEmail(patch.getEmail());
-        }
-        if (patch.isFuentePresent() && patch.getFuente() == null) {
-            throw new ValidationException("La fuente debe ser una de: instagram, facebook, landing_page, referido, otro");
+        if (patch.isEmailPresent() && isBlank(patch.getEmail())) {
+            throw new ValidationException("El email no puede estar vacio");
         }
     }
 
     private void validateId(Long id) {
         if (id == null || id <= 0) {
             throw new ValidationException("El id del lead debe ser un numero positivo");
-        }
-    }
-
-    private void validateEmail(String email) {
-        if (isBlank(email)) {
-            throw new ValidationException("El email no puede estar vacio");
-        }
-        if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
-            throw new ValidationException("El email no tiene un formato valido");
         }
     }
 

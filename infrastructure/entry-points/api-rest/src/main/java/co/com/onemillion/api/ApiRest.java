@@ -53,7 +53,7 @@ public class ApiRest {
 
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LeadResponse> updateLead(@PathVariable("id") Long id,
-                                                   @RequestBody UpdateLeadRequest request) {
+                                                   @Valid @RequestBody UpdateLeadRequest request) {
         LeadPatch patch = LeadRestMapper.toPatch(request);
         Lead updatedLead = updateLeadUseCase.execute(id, patch);
         return ResponseEntity.ok(LeadRestMapper.toResponse(updatedLead));

@@ -1,14 +1,20 @@
 package co.com.onemillion.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class UpdateLeadRequest {
     private final Set<String> presentFields = new HashSet<>();
+    @Size(min = 2, message = "El nombre debe tener al menos 2 caracteres")
     private String nombre;
+    @Email(message = "El email no tiene un formato valido")
     private String email;
     private String telefono;
     private String fuente;
@@ -18,6 +24,38 @@ public class UpdateLeadRequest {
     @JsonIgnore
     public boolean isPresent(String field) {
         return presentFields.contains(field);
+    }
+
+    @JsonIgnore
+    @AssertTrue(message = "Debe enviar al menos un campo para actualizar")
+    public boolean isNotEmptyPatch() {
+        return !presentFields.isEmpty();
+    }
+
+    @JsonIgnore
+    @AssertTrue(message = "El nombre no puede estar vacio")
+    public boolean isNombreValidWhenPresent() {
+        return !isPresent("nombre") || !isBlank(nombre);
+    }
+
+    @JsonIgnore
+    @AssertTrue(message = "El email no puede estar vacio")
+    public boolean isEmailValidWhenPresent() {
+        return !isPresent("email") || !isBlank(email);
+    }
+
+    @JsonIgnore
+    @AssertTrue(message = "La fuente debe ser una de: instagram, facebook, landing_page, referido, otro")
+    public boolean isFuenteValidWhenPresent() {
+        if (!isPresent("fuente")) {
+            return true;
+        }
+        if (isBlank(fuente)) {
+            return false;
+        }
+
+        return Set.of("instagram", "facebook", "landing_page", "referido", "otro")
+                .contains(fuente.trim().toLowerCase(Locale.ROOT));
     }
 
     public String getNombre() {
@@ -72,5 +110,9 @@ public class UpdateLeadRequest {
     public void setPresupuesto(BigDecimal presupuesto) {
         presentFields.add("presupuesto");
         this.presupuesto = presupuesto;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

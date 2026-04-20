@@ -79,9 +79,9 @@ class UpdateLeadUseCaseTest {
     }
 
     @Test
-    void shouldRejectInvalidEmailFormat() {
+    void shouldRejectEmptyEmailAsDefensiveValidation() {
         assertThrows(ValidationException.class, () -> useCase.execute(1L,
-                LeadPatch.builder().emailPresent(true).email("correo-malo").build()));
+                LeadPatch.builder().emailPresent(true).email(" ").build()));
     }
 
     private Lead lead(LocalDateTime createdAt) {
