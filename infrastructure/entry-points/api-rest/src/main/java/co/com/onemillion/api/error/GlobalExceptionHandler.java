@@ -3,6 +3,7 @@ package co.com.onemillion.api.error;
 import co.com.onemillion.api.dto.ErrorResponse;
 import co.com.onemillion.model.lead.exceptions.DuplicateLeadException;
 import co.com.onemillion.model.lead.exceptions.LeadBusinessException;
+import co.com.onemillion.model.lead.exceptions.LeadNotFoundException;
 import co.com.onemillion.model.lead.exceptions.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateLeadException.class)
     public ResponseEntity<ErrorResponse> handleDuplicate(DuplicateLeadException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(exception.getCode(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(LeadNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(LeadNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(exception.getCode(), exception.getMessage()));
     }
 

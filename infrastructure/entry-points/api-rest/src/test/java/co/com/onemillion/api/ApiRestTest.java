@@ -1,9 +1,11 @@
 package co.com.onemillion.api;
 
 import co.com.onemillion.api.dto.CreateLeadRequest;
+import co.com.onemillion.api.dto.LeadResponse;
 import co.com.onemillion.model.lead.Lead;
 import co.com.onemillion.model.lead.LeadSource;
 import co.com.onemillion.usecase.createlead.CreateLeadUseCase;
+import co.com.onemillion.usecase.getleadbyid.GetLeadByIdUseCase;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
@@ -23,11 +25,12 @@ class ApiRestTest {
 
     @Test
     void shouldCreateLead() {
-        CreateLeadUseCase useCase = mock(CreateLeadUseCase.class);
-        ApiRest apiRest = new ApiRest(useCase);
+        CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
+        GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase);
         LocalDateTime now = LocalDateTime.now();
 
-        when(useCase.execute(any(Lead.class))).thenReturn(Lead.builder()
+        when(createLeadUseCase.execute(any(Lead.class))).thenReturn(Lead.builder()
                 .id(1L)
                 .nombre("Ana Perez")
                 .email("ana@test.com")
@@ -50,6 +53,28 @@ class ApiRestTest {
         ));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void shouldGetLeadById() {
+        CreateLeadUseCase createLeadUseCase = mock(CreateLeadUseCase.class);
+        GetLeadByIdUseCase getLeadByIdUseCase = mock(GetLeadByIdUseCase.class);
+        ApiRest apiRest = new ApiRest(createLeadUseCase, getLeadByIdUseCase);
+        LocalDateTime now = LocalDateTime.now();
+
+        when(getLeadByIdUseCase.execute(1L)).thenReturn(Lead.builder()
+                .id(1L)
+                .nombre("Ana Perez")
+                .email("ana@test.com")
+                .fuente(LeadSource.INSTAGRAM)
+                .createdAt(now)
+                .updatedAt(now)
+                .build());
+
+        ResponseEntity<LeadResponse> response = apiRest.getLeadById(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1L, response.getBody().id());
     }
 
     @Test

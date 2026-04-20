@@ -11,7 +11,6 @@ public record LeadResponse(
         String fuente,
         String productoInteres,
         BigDecimal presupuesto,
-        boolean deleted,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

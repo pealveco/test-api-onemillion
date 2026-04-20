@@ -36,7 +36,6 @@ public final class LeadRestMapper {
                 toApiSource(lead.getFuente()),
                 lead.getProductoInteres(),
                 lead.getPresupuesto(),
-                lead.isDeleted(),
                 lead.getCreatedAt(),
                 lead.getUpdatedAt()
         );
