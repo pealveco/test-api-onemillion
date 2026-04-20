@@ -20,14 +20,13 @@ sonar {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.modules", "${modules.join(',')}"
-        property "sonar.sources", "src,deployment,settings.gradle,main.gradle,build.gradle,${modules.collect { "${it}/build.gradle" }.join(',')}"
+        property "sonar.sources", "src"
         property "sonar.exclusions", "**/MainApplication.java,**/**.bin,**/deployment/**"
         property "sonar.tests", "src/test"
         property "sonar.java.binaries", "**/build/classes/java/main"
         property "sonar.junit.reportsPath", "**/build/test-results/test"
         property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacocoMergedReport/jacocoMergedReport.xml"
-        property "sonar.externalIssuesReportPaths", "build/issues.json"
+        property "sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 

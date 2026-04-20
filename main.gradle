@@ -37,6 +37,21 @@ subprojects {
 
     test.finalizedBy(project.tasks.jacocoTestReport)
 
+    def exclusions = [
+        "co/com/onemillion/MainApplication.java",
+        "co/com/onemillion/model/**/exceptions/**",
+        "co/com/onemillion/model/**/gateways/**",
+        "co/com/onemillion/api/dto/**",
+        "co/com/onemillion/api/config/**",
+        "co/com/onemillion/jpa/config/**",
+        "co/com/onemillion/jpa/helper/**",
+        "**/LeadData.java",
+        "**/LeadFilter.java",
+        "**/LeadPage.java",
+        "**/LeadPatch.java",
+        "**/LeadSource.java",
+        "**/ErrorResponse.java"
+    ]
 
     jacocoTestReport {
         dependsOn test
@@ -46,7 +61,29 @@ subprojects {
             csv.setRequired false
             html.setOutputLocation layout.buildDirectory.dir("reports/jacocoHtml")
         }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: exclusions)
+            }))
+        }
     }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.80
+                }
+            }
+        }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: exclusions)
+            }))
+        }
+    }
+
+    check.dependsOn jacocoTestCoverageVerification
 
 }
 
