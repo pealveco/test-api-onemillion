@@ -28,7 +28,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run tests
-        run: ./gradlew test --stacktrace
+        run: ./gradlew clean test --stacktrace
 
       - name: Build project
         run: ./gradlew clean build -x test --stacktrace
