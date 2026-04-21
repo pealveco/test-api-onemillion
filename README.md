@@ -1,47 +1,108 @@
-# Proyecto Base Implementando Clean Architecture
+# 🚀 OMC Leads API - Clean Architecture
 
-## Antes de Iniciar
+API REST profesional para la gestión estratégica de leads, diseñada bajo los principios de **Clean Architecture** y el scaffold oficial de **Bancolombia**. Este proyecto permite centralizar la captura de prospectos, generar analítica de conversión y obtener resúmenes ejecutivos potenciados por Inteligencia Artificial (Mock).
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
+## 1. 📌 Descripción del Proyecto
+Esta API resuelve la necesidad de gestionar el ciclo de vida de prospectos (leads) de forma eficiente y escalable.
 
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+### Características principales:
+*   **Gestión Integral (CRUD):** Creación, consulta, actualización parcial (PATCH) y eliminación lógica (Soft Delete) de leads.
+*   **Filtros Avanzados:** Búsqueda por fuente (`instagram`, `facebook`, etc.) y rangos de fechas con paginación optimizada.
+*   **Dashboard de Estadísticas:** Endpoint especializado para obtener métricas de conversión, promedios de presupuesto y leads recientes.
+*   **Executive AI Summary:** Generación de resúmenes estratégicos basados en los datos de los leads, utilizando una arquitectura desacoplada para IA.
+*   **Persistencia Robusta:** Integración con PostgreSQL y precarga de datos (Seed) para pruebas inmediatas.
 
-# Arquitectura
+---
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+## 2. 🧱 Arquitectura
+El proyecto sigue rigurosamente los principios de **Arquitectura Limpia**, separando las reglas de negocio de los detalles de infraestructura:
 
-## Domain
+*   **Domain (Núcleo):**
+    *   **Model:** Entidades de negocio (`Lead`, `LeadStats`) y contratos/puertos (`LeadRepository`, `AiSummaryGateway`).
+    *   **UseCase:** Lógica pura de negocio (Crear, Listar, Estadísticas, Resumen IA).
+*   **Infrastructure (Adaptadores):**
+    *   **Entry Points:** API REST MVC documentada con Swagger.
+    *   **Driven Adapters:** Persistencia con JPA Repository y un **Mock de IA** para la generación de resúmenes sin dependencia de APIs externas.
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+### Desacople de IA:
+La lógica de IA está definida mediante el puerto `AiSummaryGateway`. Esto permite que el sistema sea agnóstico al proveedor (OpenAI, Anthropic, Mock), permitiendo cambiar la implementación en segundos sin tocar la lógica de negocio.
 
-## Usecases
+---
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+## 3. 🚀 Tecnologías utilizadas
+*   **Java 21** (LTS)
+*   **Spring Boot 3.x** (Web MVC, Data JPA, Validation)
+*   **PostgreSQL 15**
+*   **Docker & Docker Compose**
+*   **SpringDoc OpenAPI** (Swagger UI)
+*   **Lombok**
+*   **Gradle 9.x**
 
-## Infrastructure
+---
 
-### Helpers
+## 4. ⚙️ Cómo ejecutar el proyecto
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+### 4.1 Requisitos previos
+*   Java 21 instalado.
+*   Docker y Docker Compose instalados.
 
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+### 4.2 Levantar base de datos
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+Desde la raíz del proyecto, ejecuta:
 
-### Driven Adapters
+```bash
+docker compose up -d
+```
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+*Esto levantará una instancia de PostgreSQL en el puerto `5432` con la base de datos `omc_leads_db`.*
 
-### Entry Points
+### 4.3 Ejecutar la aplicación
+El script de inicialización (`schema.sql`) creará automáticamente las tablas e insertará **12 registros de prueba** (Seed).
 
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
+```bash
+./gradlew bootRun
+```
 
-## Application
+*La API estará disponible en: `http://localhost:8080`*
 
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
+---
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+## 5. 📖 Documentación de la API
+La API está totalmente documentada y disponible para pruebas visuales a través de **Swagger UI**:
+
+*   **Swagger UI:** [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+*   **OpenAPI Specs (JSON):** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+---
+
+## 6. 🛠 Endpoints Principales
+
+### Leads (CRUD)
+*   `POST /leads`: Crear un lead (Valida email único y formato).
+*   `GET /leads`: Listado paginado con filtros (`?source=facebook&startDate=2023-11-01`).
+*   `PATCH /leads/{id}`: Actualización parcial inteligente.
+*   `DELETE /leads/{id}`: Soft delete (mantiene integridad referencial).
+
+### Inteligencia y Analítica
+*   `GET /leads/stats`: Métricas de negocio (Totales por fuente, promedios, activos).
+*   `POST /leads/ai/summary`: Genera un resumen ejecutivo dinámico. Acepta filtros en el body para resúmenes segmentados.
+
+---
+
+## 7. ✅ Calidad y Validación
+Para asegurar la consistencia de la arquitectura y la integridad del proyecto, puedes ejecutar:
+
+**Validación de estructura del scaffold:**
+
+```bash
+./gradlew validateStructure
+```
+
+**Ejecución de pruebas unitarias:**
+
+```bash
+./gradlew test
+```
+
+---
+**Desarrollado como prueba técnica para One Million Copy SAS.**

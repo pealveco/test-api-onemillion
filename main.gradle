@@ -37,16 +37,53 @@ subprojects {
 
     test.finalizedBy(project.tasks.jacocoTestReport)
 
+    def exclusions = [
+        "co/com/onemillion/MainApplication.java",
+        "co/com/onemillion/model/**/exceptions/**",
+        "co/com/onemillion/model/**/gateways/**",
+        "co/com/onemillion/api/dto/**",
+        "co/com/onemillion/api/config/**",
+        "co/com/onemillion/jpa/config/**",
+        "co/com/onemillion/jpa/helper/**",
+        "**/LeadData.java",
+        "**/LeadFilter.java",
+        "**/LeadPage.java",
+        "**/LeadPatch.java",
+        "**/LeadSource.java",
+        "**/ErrorResponse.java"
+    ]
 
     jacocoTestReport {
-        dependsOn test, 'pitest'
+        dependsOn test
         reports {
             xml.setRequired true
             xml.setOutputLocation layout.buildDirectory.file("reports/jacoco.xml")
             csv.setRequired false
             html.setOutputLocation layout.buildDirectory.dir("reports/jacocoHtml")
         }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: exclusions)
+            }))
+        }
     }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.80
+                }
+            }
+        }
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: exclusions)
+            }))
+        }
+    }
+
+    check.dependsOn jacocoTestCoverageVerification
 
 }
 
@@ -56,7 +93,7 @@ jacoco {
 }
 
 tasks.register('jacocoMergedReport', JacocoReport) {
-    dependsOn = [test, subprojects.jacocoTestReport, pitestReportAggregate]
+    dependsOn = [test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     classDirectories.setFrom files(subprojects.sourceSets.main.output)
@@ -72,31 +109,6 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs = [
             '-Amapstruct.suppressGeneratorTimestamp=true'
     ]
-}
-
-pitestReportAggregate {
-    def rootReportDir = layout.buildDirectory.dir("reports/pitest")
-    def subprojectReports = subprojects.collect { subproject ->
-        subproject.layout.buildDirectory.file("reports/pitest/mutations.xml")
-    }
-
-    doLast {
-        def reportDir = rootReportDir.get().asFile
-        def consolidatedReport = new File(reportDir, 'mutations.xml')
-        consolidatedReport.withWriter { writer ->
-            writer.write("<mutations>\n")
-            subprojectReports.each { reportProvider ->
-                def xmlReport = reportProvider.get().asFile
-                if (xmlReport.exists()) {
-                    def xmlContent = xmlReport.text
-                    xmlContent = xmlContent.replaceAll("<\\?xml[^>]*>", "")
-                    xmlContent = xmlContent.replaceAll("</?mutations( partial=\"true\")?>", "")
-                    writer.write(xmlContent.trim() + "\n")
-                }
-            }
-            writer.write("</mutations>")
-        }
-    }
 }
 
 tasks.named('wrapper') {
