@@ -31,4 +31,12 @@ sonar {
     }
 }
 
+subprojects {
+    tasks.withType(JacocoCoverageVerification).configureEach {
+        dependsOn(tasks.matching { it.name == "test" })
+        dependsOn(tasks.matching { it.name == "processResources" })
+        dependsOn(tasks.matching { it.name == "classes" })
+    }
+}
+
 apply from: './main.gradle'
