@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /workspace
 
 COPY . .
 
@@ -9,12 +9,12 @@ RUN ./gradlew clean bootJar -x test
 
 FROM eclipse-temurin:21-jre-alpine
 
-WORKDIR /app
+WORKDIR /workspace
 
-COPY --from=builder /app/applications/app-service/build/libs/*.jar app.jar
+COPY --from=builder /workspace/applications/app-service/build/libs/*.jar app.jar
 
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["/bin/sh", "-c", "java $JAVA_OPTS -jar /workspace/app.jar"]
