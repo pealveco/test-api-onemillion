@@ -115,8 +115,8 @@ El despliegue se actualiza automáticamente desde la rama `main`.
 
 ## Swagger
 
-- Swagger UI: https://TU-URL.onrender.com/swagger-ui/index.html
-- OpenAPI JSON: https://TU-URL.onrender.com/v3/api-docs
+- Swagger UI: https://test-api-onemillion.onrender.com/swagger-ui/index.html
+- OpenAPI JSON: https://test-api-onemillion.onrender.com/v3/api-docs
 
 ---
 **Desarrollado como prueba técnica para One Million Copy SAS.**
