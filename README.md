@@ -104,5 +104,19 @@ Para asegurar la consistencia de la arquitectura y la integridad del proyecto, p
 ./gradlew test
 ```
 
+## CI/CD
+
+El proyecto usa GitHub Actions para integración continua sobre la rama `main`, ejecutando tests y build con Gradle.
+
+## Deploy
+
+La API está desplegada en Render con PostgreSQL administrado.
+El despliegue se actualiza automáticamente desde la rama `main`.
+
+## Swagger
+
+- Swagger UI: https://TU-URL.onrender.com/swagger-ui/index.html
+- OpenAPI JSON: https://TU-URL.onrender.com/v3/api-docs
+
 ---
 **Desarrollado como prueba técnica para One Million Copy SAS.**
