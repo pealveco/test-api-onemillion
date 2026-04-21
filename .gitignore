@@ -27,6 +27,7 @@ spring.log
 .env.*
 !.env.example
 !.env.template
+leads.txt
 application-local.yml
 application-local.yaml
 application-local.properties

@@ -12,9 +12,9 @@ spring:
     include:
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d7jc3un7f7vs738qdblg-a.oregon-postgres.render.com:5432/omc_leads_db}
-    username: ${SPRING_DATASOURCE_USERNAME:omc_leads_db_user}
-    password: ${SPRING_DATASOURCE_PASSWORD:BmH328Lg1VhqaTtkhUT3ghjhqqDyoYPU}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     driverClassName: org.postgresql.Driver
 
