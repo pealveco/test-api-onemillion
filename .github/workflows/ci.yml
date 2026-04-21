@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -21,14 +21,14 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Setup Gradle
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Grant execute permission to Gradle wrapper
+      - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
       - name: Run tests
         run: ./gradlew test
 
-      - name: Build application
+      - name: Build project
         run: ./gradlew clean build -x test
